@@ -262,12 +262,18 @@
                             2
                         );
 
-                        const hexColor = baseColor.slice(1);
+                        const hexColor = baseColor.slice(1).toLowerCase();
+                        const transparencyHex = Math.round(
+                            backgroundTransparency * 255
+                        )
+                            .toString(16)
+                            .padStart(2, "0")
+                            .toLowerCase();
                         const mode = isDarkMode ? "dark" : "light";
                         const outline = enableOutlinesSeparators
                             ? "-outline"
                             : "";
-                        const fileName = `${hexColor}-${mode}${outline}.json`;
+                        const fileName = `${hexColor}${transparencyHex}-${mode}${outline}.json`;
 
                         const blob = new Blob([jsonString], {
                             type: "application/json",

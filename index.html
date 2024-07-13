@@ -1,47 +1,285 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Theme Generator</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-        }
-        label, input {
-            display: block;
-            margin-bottom: 10px;
-        }
-        button {
-            padding: 10px 20px;
-            background-color: #464dd3;
-            color: white;
-            border: none;
-            cursor: pointer;
-        }
-    </style>
-</head>
-<body>
-    <h1>Theme Generator</h1>
-    <form id="theme-form">
-        <label for="sourceColor">Source Color (hex):</label>
-        <input type="text" id="sourceColor" name="sourceColor" value="#464dd3" required>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Theme Generator</title>
+        <link rel="stylesheet" href="styles.css" />
+        <link
+            rel="stylesheet"
+            href="https://cdn.jsdelivr.net/npm/@simonwep/pickr/dist/themes/classic.min.css"
+        />
+    </head>
 
-        <label for="isDarkMode">Dark Mode:</label>
-        <input type="checkbox" id="isDarkMode" name="isDarkMode" checked>
+    <body>
+        <div class="container">
+            <h1>Theme Generator</h1>
+            <div class="pickr-container">
+                <p>Choose a base color:</p>
+                <div id="color-picker"></div>
+            </div>
+            <div class="settings">
+                <label for="darkMode">Dark Mode:</label>
+                <input type="checkbox" id="darkMode" />
+                <label for="transparency">Background Transparency:</label>
+                <input
+                    type="range"
+                    id="transparency"
+                    min="0"
+                    max="1"
+                    step="0.01"
+                    value="0.8"
+                />
+                <span id="transparency-value">0.8</span>
+                <label for="outlines">Enable Outlines/Separators:</label>
+                <input type="checkbox" id="outlines" />
+            </div>
+            <button id="generate">Generate Theme</button>
+        </div>
+        <script src="https://cdn.jsdelivr.net/npm/@simonwep/pickr/dist/pickr.min.js"></script>
+        <script type="module">
+            import {
+                argbFromHex,
+                themeFromSourceColor,
+            } from "https://cdn.jsdelivr.net/npm/@importantimport/material-color-utilities@0.2.2-alpha.0/+esm";
 
-        <label for="backgroundTransparency">Background Transparency (0-1):</label>
-        <input type="number" id="backgroundTransparency" name="backgroundTransparency" value="0.8" min="0" max="1" step="0.1" required>
+            document.addEventListener("DOMContentLoaded", () => {
+                const pickr = Pickr.create({
+                    el: "#color-picker",
+                    theme: "classic",
+                    default: "#464dd3",
+                    swatches: [
+                        "#264653",
+                        "#2a9d8f",
+                        "#e9c46a",
+                        "#f4a261",
+                        "#e76f51",
+                    ],
+                    components: {
+                        preview: true,
+                        opacity: true,
+                        hue: true,
+                        interaction: {
+                            hex: true,
+                            rgba: true,
+                            input: true,
+                            save: true,
+                        },
+                    },
+                });
 
-        <label for="enableOutlinesSeparators">Enable Outlines and Separators:</label>
-        <input type="checkbox" id="enableOutlinesSeparators" name="enableOutlinesSeparators">
+                pickr.on("change", (color, source, instance) => {
+                    pickr.setColor(color.toHEXA().toString());
+                });
 
-        <button type="submit">Generate Theme</button>
-    </form>
+                const transparencySlider =
+                    document.getElementById("transparency");
+                const transparencyValue =
+                    document.getElementById("transparency-value");
 
-    <pre id="output"></pre>
+                transparencySlider.addEventListener("input", (event) => {
+                    transparencyValue.textContent = event.target.value;
+                });
 
-    <script src="script.js"></script>
-</body>
+                document
+                    .getElementById("generate")
+                    .addEventListener("click", () => {
+                        const baseColor = pickr.getColor().toHEXA().toString();
+                        const isDarkMode =
+                            document.getElementById("darkMode").checked;
+                        const backgroundTransparency = parseFloat(
+                            transparencySlider.value
+                        );
+                        const enableOutlinesSeparators =
+                            document.getElementById("outlines").checked;
+
+                        const theme = themeFromSourceColor(
+                            argbFromHex(baseColor)
+                        );
+                        const scheme = isDarkMode
+                            ? theme.schemes.dark
+                            : theme.schemes.light;
+
+                        const ARGB2RGBA = (argb, alpha = 1.0) => [
+                            ((argb >> 16) & 0xff) / 255,
+                            ((argb >> 8) & 0xff) / 255,
+                            (argb & 0xff) / 255,
+                            alpha,
+                        ];
+
+                        const generatedTheme = {
+                            // Backgrounds
+                            additional_background: ARGB2RGBA(
+                                scheme.background,
+                                backgroundTransparency
+                            ),
+                            button_active_background: ARGB2RGBA(
+                                scheme.secondaryContainer,
+                                backgroundTransparency
+                            ),
+                            button_background: ARGB2RGBA(
+                                scheme.surface,
+                                backgroundTransparency
+                            ),
+                            disabled_switch_background: ARGB2RGBA(
+                                scheme.surfaceVariant,
+                                backgroundTransparency
+                            ),
+                            enabled_switch_background: ARGB2RGBA(
+                                scheme.secondaryContainer,
+                                backgroundTransparency
+                            ),
+                            group_background: ARGB2RGBA(
+                                scheme.background,
+                                backgroundTransparency
+                            ),
+                            hero_tab_filter_background: ARGB2RGBA(
+                                scheme.secondaryContainer,
+                                backgroundTransparency
+                            ),
+                            keybind_background: ARGB2RGBA(
+                                scheme.background,
+                                backgroundTransparency
+                            ),
+                            keybind_background_active: ARGB2RGBA(
+                                scheme.secondaryContainer,
+                                backgroundTransparency
+                            ),
+                            left_tabs_background: ARGB2RGBA(
+                                scheme.background,
+                                backgroundTransparency
+                            ),
+                            main_background: ARGB2RGBA(
+                                scheme.surface,
+                                backgroundTransparency
+                            ),
+                            popup_background: ARGB2RGBA(
+                                scheme.surface,
+                                backgroundTransparency
+                            ),
+                            selected_tabs_background: ARGB2RGBA(
+                                scheme.secondaryContainer,
+                                backgroundTransparency
+                            ),
+                            slider_background: ARGB2RGBA(
+                                scheme.surfaceVariant,
+                                backgroundTransparency
+                            ),
+                            slider_background_active: ARGB2RGBA(
+                                scheme.primary,
+                                backgroundTransparency
+                            ),
+                            combo_frame: ARGB2RGBA(
+                                scheme.surfaceVariant,
+                                backgroundTransparency
+                            ),
+                            combo_item: ARGB2RGBA(
+                                scheme.secondaryContainer,
+                                backgroundTransparency
+                            ),
+                            combo_item_active: ARGB2RGBA(
+                                scheme.secondary,
+                                backgroundTransparency
+                            ),
+                            multiselect_item: ARGB2RGBA(
+                                scheme.secondaryContainer,
+                                backgroundTransparency
+                            ),
+                            multiselect_item_selected: ARGB2RGBA(
+                                scheme.secondary,
+                                backgroundTransparency
+                            ),
+                            input_text_bg: ARGB2RGBA(
+                                scheme.background,
+                                backgroundTransparency
+                            ),
+                            scrollbar_bg: ARGB2RGBA(
+                                scheme.surfaceVariant,
+                                backgroundTransparency
+                            ),
+
+                            // Outlines and Separators
+                            group_outline: enableOutlinesSeparators
+                                ? ARGB2RGBA(scheme.outlineVariant)
+                                : [0, 0, 0, 0],
+                            hero_tab_filter_separator: enableOutlinesSeparators
+                                ? ARGB2RGBA(scheme.outlineVariant)
+                                : [0, 0, 0, 0],
+                            outline: enableOutlinesSeparators
+                                ? ARGB2RGBA(scheme.outline)
+                                : [0, 0, 0, 0],
+                            popup_border: enableOutlinesSeparators
+                                ? ARGB2RGBA(scheme.outlineVariant)
+                                : [0, 0, 0, 0],
+                            search_outline: enableOutlinesSeparators
+                                ? ARGB2RGBA(scheme.outlineVariant)
+                                : [0, 0, 0, 0],
+                            separator: enableOutlinesSeparators
+                                ? ARGB2RGBA(scheme.outline)
+                                : [0, 0, 0, 0],
+
+                            // Text
+                            active_widgets_text: ARGB2RGBA(scheme.onBackground),
+                            primary_first_tab_text: ARGB2RGBA(scheme.primary),
+                            primary_second_tab_text: ARGB2RGBA(
+                                scheme.secondary
+                            ),
+                            primary_widgets_text: ARGB2RGBA(
+                                scheme.onSecondaryContainer
+                            ),
+                            search_text: ARGB2RGBA(scheme.onPrimaryContainer),
+                            section_group_text: ARGB2RGBA(scheme.onBackground),
+                            third_tab_text: ARGB2RGBA(scheme.secondary),
+
+                            // Shadows
+                            text_shadow: ARGB2RGBA(scheme.shadow),
+                            shadow: ARGB2RGBA(scheme.shadow),
+                            widgets_shadow: ARGB2RGBA(scheme.shadow),
+
+                            // Sliders
+                            slider_grab: ARGB2RGBA(scheme.secondaryContainer),
+                            slider_grab_active: ARGB2RGBA(scheme.secondary),
+
+                            // Healthbars
+                            healthbar_ally: [0.184, 0.698, 0.176, 1.0],
+                            healthbar_enemy: [0.765, 0.227, 0.184, 1.0],
+                            healthbar_roshan: [0.81, 0.21, 0.21, 1.0],
+                            healthbar_self: [0.678, 0.961, 0.384, 1.0],
+                            manabar: [0.31, 0.471, 0.98, 1.0],
+
+                            // Miscellaneous
+                            disabled_switch_circle: ARGB2RGBA(
+                                scheme.onBackground
+                            ),
+                            indication_active: ARGB2RGBA(scheme.primary),
+                            indication_inactive: ARGB2RGBA(scheme.onBackground),
+                            primary: ARGB2RGBA(scheme.primary),
+                        };
+
+                        const jsonString = JSON.stringify(
+                            generatedTheme,
+                            null,
+                            2
+                        );
+
+                        const hexColor = baseColor.slice(1);
+                        const mode = isDarkMode ? "dark" : "light";
+                        const outline = enableOutlinesSeparators
+                            ? "-outline"
+                            : "";
+                        const fileName = `${hexColor}-${mode}${outline}.json`;
+
+                        const blob = new Blob([jsonString], {
+                            type: "application/json",
+                        });
+                        const url = URL.createObjectURL(blob);
+                        const a = document.createElement("a");
+                        a.href = url;
+                        a.download = fileName;
+                        a.click();
+                        URL.revokeObjectURL(url);
+                    });
+            });
+        </script>
+    </body>
 </html>

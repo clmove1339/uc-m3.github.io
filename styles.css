@@ -1,5 +1,13 @@
+:root {
+    --accent-color: #464dd3;
+    --background-color: #1e1e1e;
+    --text-color: #e0e0e0;
+    --button-background-color: #007bff;
+    --button-hover-background-color: #0056b3;
+}
+
 body {
-    font-family: Arial, sans-serif;
+    font-family: 'Museo Sans 500', Arial, sans-serif;
     margin: 0;
     padding: 0;
     display: flex;
@@ -7,12 +15,12 @@ body {
     align-items: center;
     height: 100vh;
     background-color: #121212;
-    color: #e0e0e0;
+    color: var(--text-color);
 }
 
 .container {
     text-align: center;
-    background-color: #1e1e1e;
+    background-color: var(--background-color);
     padding: 20px;
     border-radius: 8px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
@@ -44,7 +52,7 @@ button {
     padding: 10px 20px;
     font-size: 16px;
     color: white;
-    background-color: #007bff;
+    background-color: var(--button-background-color);
     border: none;
     border-radius: 25px;
     cursor: pointer;
@@ -52,7 +60,7 @@ button {
 }
 
 button:hover {
-    background-color: #0056b3;
+    background-color: var(--button-hover-background-color);
 }
 
 .settings input[type="range"] {
@@ -100,7 +108,7 @@ button:hover {
 }
 
 input:checked + .slider {
-    background-color: #2196f3;
+    background-color: var(--accent-color);
 }
 
 input:checked + .slider:before {
@@ -134,10 +142,32 @@ input:checked + .slider:before {
     bottom: 10px;
     right: 10px;
     display: block;
-    align-items:end;
+    align-items: end;
     font-size: 14px;
 }
 
 .visit-counter img {
     margin-left: 5px; /* Adjust margin as needed */
+}
+
+.contacts {
+    position: fixed;
+    bottom: 10px;
+    left: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.contacts div {
+    margin-bottom: 5px;
+}
+
+.contacts a {
+    color: var(--accent-color);
+    text-decoration: none;
+}
+
+.contacts a:hover {
+    text-decoration: underline;
 }

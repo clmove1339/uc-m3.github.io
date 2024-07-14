@@ -55,6 +55,13 @@
             </label>
         </div>
         <button id="generate">Generate Theme</button>
+
+        <br>
+
+        <div class="visit-counter">
+            <img src="https://moe-counter.es3n1n.eu/get/@clmove1339-umbrella-m3-theme?theme=moebooru"
+                alt="views-counter" height="96" />
+        </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/@simonwep/pickr/dist/pickr.min.js"></script>
@@ -80,7 +87,8 @@
             });
 
             pickr.on('change', (color) => {
-                pickr.setColor(color.toHEXA().toString());
+                const hexColor = color.toHEXA().toString();
+                pickr.setColor(hexColor);
             });
 
             const transparencySlider = document.getElementById("transparency");

@@ -12,11 +12,13 @@
     <div class="container">
         <h1>umbrella m3 palette generator</h1>
         <div class="settings">
-            <label for="colorpicker">
-                Accent color
+            <div id="pickr" class="pickr">
+                <label for="colorpicker">
+                    Accent color
 
-                <div id="colorpicker"></div>
-            </label>
+                    <div id="colorpicker"></div>
+                </label>
+            </div>
 
             <br>
 
@@ -28,21 +30,21 @@
                 </div>
             </label>
 
-            <br />
+            <br>
 
             <label for="transparency">
                 Transparency
                 <input type="range" id="transparency" min="0" max="1" step="0.01" value="0.8" />
             </label>
 
-            <br />
+            <br>
 
             <label for="shadows">
                 Shadows
                 <input type="range" id="shadows" min="0" max="1" step="0.01" value="1" />
             </label>
 
-            <br />
+            <br>
 
             <label for="outlines">
                 Show Outlines & Separators
@@ -55,17 +57,15 @@
         <button id="generate">Generate Theme</button>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/@simonwep/pickr/dist/pickr.min.js"></script>
     <script type="module">
-        import {
-            argbFromHex,
-            themeFromSourceColor,
-        } from "https://cdn.jsdelivr.net/npm/@importantimport/material-color-utilities@0.2.2-alpha.0/+esm";
+        import { argbFromHex, themeFromSourceColor } from "https://cdn.jsdelivr.net/npm/@importantimport/material-color-utilities@0.2.2-alpha.0/+esm";
 
         document.addEventListener("DOMContentLoaded", () => {
             const pickr = Pickr.create({
-                el: "#colorpicker",
-                theme: "classic",
-                default: "#464dd3",
+                el: '#colorpicker',
+                theme: 'classic',
+                default: '#464dd3',
                 components: {
                     hue: true,
                     interaction: {
@@ -75,11 +75,11 @@
                         hsva: true,
                         cmyk: true,
                         input: true,
-                    },
-                },
+                    }
+                }
             });
 
-            pickr.on("change", (color, source, instance) => {
+            pickr.on('change', (color) => {
                 pickr.setColor(color.toHEXA().toString());
             });
 
@@ -174,10 +174,8 @@
                     // Text
                     active_widgets_text: ARGB2RGBA(scheme.onBackground),
                     primary_first_tab_text: ARGB2RGBA(scheme.primary),
-                    primary_second_tab_text: ARGB2RGBA(
-                        scheme.secondary),
-                    primary_widgets_text: ARGB2RGBA(
-                        scheme.onSecondaryContainer),
+                    primary_second_tab_text: ARGB2RGBA(scheme.secondary),
+                    primary_widgets_text: ARGB2RGBA(scheme.onSecondaryContainer),
                     search_text: ARGB2RGBA(scheme.onPrimaryContainer),
                     section_group_text: ARGB2RGBA(scheme.onBackground),
                     third_tab_text: ARGB2RGBA(scheme.secondary),
@@ -199,8 +197,7 @@
                     manabar: [0.31, 0.471, 0.98, 1.0],
 
                     // Miscellaneous
-                    disabled_switch_circle: ARGB2RGBA(
-                        scheme.onBackground),
+                    disabled_switch_circle: ARGB2RGBA(scheme.onBackground),
                     indication_active: ARGB2RGBA(scheme.primary),
                     indication_inactive: ARGB2RGBA(scheme.onBackground),
                     primary: ARGB2RGBA(scheme.primary),
@@ -225,8 +222,6 @@
             });
         });
     </script>
-
-    <script src="https://cdn.jsdelivr.net/npm/@simonwep/pickr/dist/pickr.min.js"></script>
 </body>
 
 </html>

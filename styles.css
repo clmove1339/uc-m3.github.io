@@ -2,8 +2,6 @@
     --accent-color: #464dd3;
     --background-color: #1e1e1e;
     --text-color: #e0e0e0;
-    --button-background-color: #007bff;
-    --button-hover-background-color: #0056b3;
 }
 
 body {
@@ -52,15 +50,10 @@ button {
     padding: 10px 20px;
     font-size: 16px;
     color: white;
-    background-color: var(--button-background-color);
     border: none;
     border-radius: 25px;
     cursor: pointer;
     width: 100%; /* Make the button width 100% */
-}
-
-button:hover {
-    background-color: var(--button-hover-background-color);
 }
 
 .settings input[type="range"] {
@@ -164,10 +157,40 @@ input:checked + .slider:before {
 }
 
 .contacts a {
-    color: var(--accent-color);
+    color: var(--text-color);
     text-decoration: none;
 }
 
 .contacts a:hover {
     text-decoration: underline;
+}
+
+input[type="range"] {
+    --sliderColor : #ccc;
+    -webkit-appearance: none;
+    appearance: none;
+    margin-right: 15px;
+    width: 200px;
+    height: 6px;
+    border-radius: 5px;
+    background: rgba(255, 255, 255, 0.6) linear-gradient(#2D2F42FF, #2D2F42FF) no-repeat;
+    background-size: 90%;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    height: 16px;
+    width: 16px;
+    border-radius: 50%;
+    background: var(--sliderColor);
+    cursor: ew-resize;
+    box-shadow: 0 0 2px 0 #555;
+    transition: background .3s ease-in-out;
+}
+
+input[type=range]::-webkit-slider-runnable-track  {
+    -webkit-appearance: none;
+    box-shadow: none;
+    border: none;
+    background: transparent;
 }

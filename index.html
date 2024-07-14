@@ -5,19 +5,17 @@
     <meta charset="UTF-8" />
     <title>umbrella m3 palette</title>
     <link rel="stylesheet" href="styles.css" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@simonwep/pickr/dist/themes/classic.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@simonwep/pickr/dist/themes/monolith.min.css" />
 </head>
 
 <body>
-    <div class="container">
+    <div class="container" id="root">
         <h1>umbrella m3 palette generator</h1>
         <div class="settings">
-            <div id="pickr" class="pickr">
-                <label for="colorpicker">
-                    Accent color
-                    <div id="colorpicker"></div>
-                </label>
-            </div>
+            <label for="colorpicker">
+                Accent Color
+                <div id="colorpicker"></div>
+            </label>
 
             <br>
 
@@ -71,166 +69,206 @@
     <script type="module">
         import { argbFromHex, themeFromSourceColor } from "https://cdn.jsdelivr.net/npm/@importantimport/material-color-utilities@0.2.2-alpha.0/+esm";
 
-        document.addEventListener("DOMContentLoaded", () => {
-            const pickr = Pickr.create({
-                el: '#colorpicker',
-                theme: 'classic',
-                default: '#464dd3',
-                components: {
-                    hue: true,
-                    interaction: {
-                        hex: true,
-                        rgba: true,
-                        hsla: true,
-                        hsva: true,
-                        cmyk: true,
-                        input: true,
-                    }
+        const pickr = Pickr.create({
+            el: '#colorpicker',
+            theme: 'monolith',
+            default: '#464dd3',
+            useAsButton: false,
+            swatches: [],
+            components: {
+                hue: true,
+                interaction: {
+                    hex: true,
+                    rgba: true,
+                    input: true,
                 }
-            });
+            }
+        });
 
-            pickr.on('change', (color) => {
-                const hexColor = color.toHEXA().toString();
-                pickr.setColor(hexColor);
-            });
+        const changeAccent = (color, source, instance) => {
+            pickr.applyColor(color.toHEXA().toString());
 
-            const transparencySlider = document.getElementById("transparency");
-            const shadowsSlider = document.getElementById("shadows");
-            const transparencyTooltip = document.createElement("div");
-            const shadowsTooltip = document.createElement("div");
-            transparencyTooltip.id = "transparency-tooltip";
-            document.body.appendChild(transparencyTooltip);
+            const theme = themeFromSourceColor(argbFromHex(pickr.getColor().toHEXA().toString()));
+            const scheme = theme.schemes.dark;
 
-            transparencySlider.addEventListener("mousemove", (event) => {
-                const value = event.target.value;
-                const rect = transparencySlider.getBoundingClientRect();
-                const tooltipWidth = transparencyTooltip.offsetWidth;
-                transparencyTooltip.style.display = "block";
-                transparencyTooltip.style.left = rect.left + rect.width / 2 - tooltipWidth / 2 + "px";
-                transparencyTooltip.style.top = rect.top - 30 + "px";
-                transparencyTooltip.textContent = `${(value * 100).toFixed(0)}%`;
-            });
+            const background = "#" + scheme.background.toString(16).slice(2, 8);
+            const text = "#" + scheme.onSurface.toString(16).slice(2, 8);
+            const border = "#" + scheme.onSurfaceVariant.toString(16).slice(2, 8) + "80";
+            const button = "#" + scheme.onSecondary.toString(16).slice(2, 8);
+            const accent = "#" + scheme.primary.toString(16).slice(2, 8);
 
-            transparencySlider.addEventListener("mouseleave", () => {
-                transparencyTooltip.style.display = "none";
-            });
+            document.body.style.backgroundColor = background;
+            document.body.style.color = text;
+            document.documentElement.style.setProperty('--accent-color', button);
+            document.documentElement.style.setProperty('--background-color', background);
+            document.documentElement.style.setProperty('--text-color', text);
+            document.getElementById("root").style.borderColor = border;
+            document.getElementById("generate").style.backgroundColor = button;
+            document.getElementById("generate").style.color = text;
+            document.getElementById('transparency').style.backgroundImage = 'linear-gradient(to right, ' + button + ', ' + button + ')';
+            document.getElementById('shadows').style.backgroundImage = 'linear-gradient(to right, ' + button + ', ' + button + ')';
+            document.getElementById('transparency').style.setProperty('--sliderColor', '#ccc');
+            document.getElementById('shadows').style.setProperty('--sliderColor', '#ccc');
+        }
 
-            shadowsTooltip.id = "shadows-tooltip";
-            document.body.appendChild(shadowsTooltip);
+        pickr.on('change', changeAccent);
+        pickr.setColor('#464dd3');
+        changeAccent(pickr.getColor());
 
-            shadowsSlider.addEventListener("mousemove", (event) => {
-                const value = event.target.value;
-                const rect = shadowsSlider.getBoundingClientRect();
-                const tooltipWidth = shadowsTooltip.offsetWidth;
-                shadowsTooltip.style.display = "block";
-                shadowsTooltip.style.left = rect.left + rect.width / 2 - tooltipWidth / 2 + "px";
-                shadowsTooltip.style.top = rect.top - 30 + "px";
-                shadowsTooltip.textContent = `${(value * 100).toFixed(0)}%`;
-            });
+        const rangeInputs = document.querySelectorAll('input[type="range"]');
+        document.getElementById('transparency').style.backgroundSize = (0.8) * 100 / (1.0) + '% 100%';
+        document.getElementById('shadows').style.backgroundSize = (1) * 100 / (1.0) + '% 100%';
+        function handleInputChange(e) {
+            let target = e.target;
 
-            shadowsSlider.addEventListener("mouseleave", () => {
-                shadowsTooltip.style.display = "none";
-            });
+            if (e.target.type !== 'range') target = document.getElementById('range');
 
-            document.getElementById("generate").addEventListener("click", () => {
-                const baseColor = pickr.getColor().toHEXA().toString();
-                const isDarkMode = document.getElementById("darkMode").checked;
-                const backgroundTransparency = parseFloat(transparencySlider.value);
-                const shadowIntensity = parseFloat(shadowsSlider.value);
-                const enableOutlinesSeparators = document.getElementById("outlines").checked;
+            const min = target.min;
+            const max = target.max;
+            const val = target.value;
+            target.style.backgroundSize = (val - min) * 100 / (max - min) + '% 100%';
+        }
 
-                const theme = themeFromSourceColor(argbFromHex(baseColor));
-                const scheme = isDarkMode ? theme.schemes.dark : theme.schemes.light;
+        rangeInputs.forEach(input => {
+            input.addEventListener('input', handleInputChange);
+        })
 
-                const ARGB2RGBA = (argb, alpha = 1.0) => [
-                    ((argb >> 16) & 0xff) / 255,
-                    ((argb >> 8) & 0xff) / 255,
-                    (argb & 0xff) / 255,
-                    alpha,
-                ];
+        const transparencySlider = document.getElementById("transparency");
+        const shadowsSlider = document.getElementById("shadows");
+        const transparencyTooltip = document.createElement("div");
+        const shadowsTooltip = document.createElement("div");
+        transparencyTooltip.id = "transparency-tooltip";
+        document.body.appendChild(transparencyTooltip);
 
-                const generatedTheme = {
-                    // Backgrounds
-                    additional_background: ARGB2RGBA(scheme.background, backgroundTransparency),
-                    button_active_background: ARGB2RGBA(scheme.secondaryContainer, backgroundTransparency),
-                    button_background: ARGB2RGBA(scheme.surface, backgroundTransparency),
-                    disabled_switch_background: ARGB2RGBA(scheme.surfaceVariant, backgroundTransparency),
-                    enabled_switch_background: ARGB2RGBA(scheme.secondaryContainer, backgroundTransparency),
-                    group_background: ARGB2RGBA(scheme.background, backgroundTransparency),
-                    hero_tab_filter_background: ARGB2RGBA(scheme.secondaryContainer, backgroundTransparency),
-                    keybind_background: ARGB2RGBA(scheme.background, backgroundTransparency),
-                    keybind_background_active: ARGB2RGBA(scheme.secondaryContainer, backgroundTransparency),
-                    left_tabs_background: ARGB2RGBA(scheme.background, backgroundTransparency),
-                    main_background: ARGB2RGBA(scheme.surface, backgroundTransparency),
-                    popup_background: ARGB2RGBA(scheme.surface, backgroundTransparency),
-                    selected_tabs_background: ARGB2RGBA(scheme.secondaryContainer, backgroundTransparency),
-                    slider_background: ARGB2RGBA(scheme.surfaceVariant, backgroundTransparency),
-                    slider_background_active: ARGB2RGBA(scheme.primary, backgroundTransparency),
-                    combo_frame: ARGB2RGBA(scheme.surfaceVariant, backgroundTransparency),
-                    combo_item: ARGB2RGBA(scheme.secondaryContainer, backgroundTransparency),
-                    combo_item_active: ARGB2RGBA(scheme.secondary, backgroundTransparency),
-                    multiselect_item: ARGB2RGBA(scheme.secondaryContainer, backgroundTransparency),
-                    multiselect_item_selected: ARGB2RGBA(scheme.secondary, backgroundTransparency),
-                    input_text_bg: ARGB2RGBA(scheme.background, backgroundTransparency),
-                    scrollbar_bg: ARGB2RGBA(scheme.surfaceVariant, backgroundTransparency),
+        transparencySlider.addEventListener("mousemove", (event) => {
+            const value = event.target.value;
+            const rect = transparencySlider.getBoundingClientRect();
+            const tooltipWidth = transparencyTooltip.offsetWidth;
+            transparencyTooltip.style.display = "block";
+            transparencyTooltip.style.left = rect.left + rect.width / 2 - tooltipWidth / 2 + "px";
+            transparencyTooltip.style.top = rect.top - 30 + "px";
+            transparencyTooltip.textContent = `${(value * 100).toFixed(0)}%`;
+        });
 
-                    // Outlines and Separators
-                    group_outline: enableOutlinesSeparators ? ARGB2RGBA(scheme.outlineVariant) : [0, 0, 0, 0],
-                    hero_tab_filter_separator: enableOutlinesSeparators ? ARGB2RGBA(scheme.outlineVariant) : [0, 0, 0, 0],
-                    outline: enableOutlinesSeparators ? ARGB2RGBA(scheme.outline) : [0, 0, 0, 0],
-                    popup_border: enableOutlinesSeparators ? ARGB2RGBA(scheme.outlineVariant) : [0, 0, 0, 0],
-                    search_outline: enableOutlinesSeparators ? ARGB2RGBA(scheme.outlineVariant) : [0, 0, 0, 0],
-                    separator: enableOutlinesSeparators ? ARGB2RGBA(scheme.outline) : [0, 0, 0, 0],
+        transparencySlider.addEventListener("mouseleave", () => {
+            transparencyTooltip.style.display = "none";
+        });
 
-                    // Text
-                    active_widgets_text: ARGB2RGBA(scheme.onBackground),
-                    primary_first_tab_text: ARGB2RGBA(scheme.primary),
-                    primary_second_tab_text: ARGB2RGBA(scheme.secondary),
-                    primary_widgets_text: ARGB2RGBA(scheme.onSecondaryContainer),
-                    search_text: ARGB2RGBA(scheme.onPrimaryContainer),
-                    section_group_text: ARGB2RGBA(scheme.onBackground),
-                    third_tab_text: ARGB2RGBA(scheme.secondary),
+        shadowsTooltip.id = "shadows-tooltip";
+        document.body.appendChild(shadowsTooltip);
 
-                    // Shadows
-                    text_shadow: ARGB2RGBA(scheme.shadow, shadowIntensity),
-                    shadow: ARGB2RGBA(scheme.shadow, shadowIntensity),
-                    widgets_shadow: ARGB2RGBA(scheme.shadow, shadowIntensity),
+        shadowsSlider.addEventListener("mousemove", (event) => {
+            const value = event.target.value;
+            const rect = shadowsSlider.getBoundingClientRect();
+            const tooltipWidth = shadowsTooltip.offsetWidth;
+            shadowsTooltip.style.display = "block";
+            shadowsTooltip.style.left = rect.left + rect.width / 2 - tooltipWidth / 2 + "px";
+            shadowsTooltip.style.top = rect.top - 30 + "px";
+            shadowsTooltip.textContent = `${(value * 100).toFixed(0)}%`;
+        });
 
-                    // Sliders
-                    slider_grab: ARGB2RGBA(scheme.secondaryContainer),
-                    slider_grab_active: ARGB2RGBA(scheme.secondary),
+        shadowsSlider.addEventListener("mouseleave", () => {
+            shadowsTooltip.style.display = "none";
+        });
 
-                    // Healthbars
-                    healthbar_ally: [0.184, 0.698, 0.176, 1.0],
-                    healthbar_enemy: [0.765, 0.227, 0.184, 1.0],
-                    healthbar_roshan: [0.81, 0.21, 0.21, 1.0],
-                    healthbar_self: [0.678, 0.961, 0.384, 1.0],
-                    manabar: [0.31, 0.471, 0.98, 1.0],
+        document.getElementById("generate").addEventListener("click", () => {
+            const baseColor = pickr.getColor().toHEXA().toString();
+            const isDarkMode = document.getElementById("darkMode").checked;
+            const backgroundTransparency = parseFloat(transparencySlider.value);
+            const shadowIntensity = parseFloat(shadowsSlider.value);
+            const enableOutlinesSeparators = document.getElementById("outlines").checked;
 
-                    // Miscellaneous
-                    disabled_switch_circle: ARGB2RGBA(scheme.onBackground),
-                    indication_active: ARGB2RGBA(scheme.primary),
-                    indication_inactive: ARGB2RGBA(scheme.onBackground),
-                    primary: ARGB2RGBA(scheme.primary),
-                };
+            const theme = themeFromSourceColor(argbFromHex(baseColor));
+            const scheme = isDarkMode ? theme.schemes.dark : theme.schemes.light;
 
-                const jsonString = JSON.stringify(generatedTheme, null, 2);
+            const ARGB2RGBA = (argb, alpha = 1.0) => [
+                ((argb >> 16) & 0xff) / 255,
+                ((argb >> 8) & 0xff) / 255,
+                (argb & 0xff) / 255,
+                alpha,
+            ];
 
-                const hexColor = baseColor.slice(1).toLowerCase();
-                const transparencyHex = Math.round(backgroundTransparency * 255).toString(16).padStart(2, "0").toLowerCase();
-                const shadowsHex = Math.round(shadowIntensity * 255).toString(16).padStart(2, "0").toLowerCase();
-                const mode = isDarkMode ? "dark" : "light";
-                const outline = enableOutlinesSeparators ? "-outline" : "";
-                const fileName = `${hexColor}${transparencyHex}-${shadowsHex}-${mode}${outline}.json`;
+            const generatedTheme = {
+                // Backgrounds
+                additional_background: ARGB2RGBA(scheme.background, backgroundTransparency),
+                button_active_background: ARGB2RGBA(scheme.secondaryContainer, backgroundTransparency),
+                button_background: ARGB2RGBA(scheme.surface, backgroundTransparency),
+                disabled_switch_background: ARGB2RGBA(scheme.surfaceVariant, backgroundTransparency),
+                enabled_switch_background: ARGB2RGBA(scheme.secondaryContainer, backgroundTransparency),
+                group_background: ARGB2RGBA(scheme.background, backgroundTransparency),
+                hero_tab_filter_background: ARGB2RGBA(scheme.secondaryContainer, backgroundTransparency),
+                keybind_background: ARGB2RGBA(scheme.background, backgroundTransparency),
+                keybind_background_active: ARGB2RGBA(scheme.secondaryContainer, backgroundTransparency),
+                left_tabs_background: ARGB2RGBA(scheme.background, backgroundTransparency),
+                main_background: ARGB2RGBA(scheme.surface, backgroundTransparency),
+                popup_background: ARGB2RGBA(scheme.surface, backgroundTransparency),
+                selected_tabs_background: ARGB2RGBA(scheme.secondaryContainer, backgroundTransparency),
+                slider_background: ARGB2RGBA(scheme.surfaceVariant, backgroundTransparency),
+                slider_background_active: ARGB2RGBA(scheme.primary, backgroundTransparency),
+                combo_frame: ARGB2RGBA(scheme.surfaceVariant, backgroundTransparency),
+                combo_item: ARGB2RGBA(scheme.secondaryContainer, backgroundTransparency),
+                combo_item_active: ARGB2RGBA(scheme.secondary, backgroundTransparency),
+                multiselect_item: ARGB2RGBA(scheme.secondaryContainer, backgroundTransparency),
+                multiselect_item_selected: ARGB2RGBA(scheme.secondary, backgroundTransparency),
+                input_text_bg: ARGB2RGBA(scheme.background, backgroundTransparency),
+                scrollbar_bg: ARGB2RGBA(scheme.surfaceVariant, backgroundTransparency),
 
-                const blob = new Blob([jsonString], { type: "application/json" });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement("a");
-                a.href = url;
-                a.download = fileName;
-                a.click();
-                URL.revokeObjectURL(url);
-            });
+                // Outlines and Separators
+                group_outline: enableOutlinesSeparators ? ARGB2RGBA(scheme.outlineVariant) : [0, 0, 0, 0],
+                hero_tab_filter_separator: enableOutlinesSeparators ? ARGB2RGBA(scheme.outlineVariant) : [0, 0, 0, 0],
+                outline: enableOutlinesSeparators ? ARGB2RGBA(scheme.outline) : [0, 0, 0, 0],
+                popup_border: enableOutlinesSeparators ? ARGB2RGBA(scheme.outlineVariant) : [0, 0, 0, 0],
+                search_outline: enableOutlinesSeparators ? ARGB2RGBA(scheme.outlineVariant) : [0, 0, 0, 0],
+                separator: enableOutlinesSeparators ? ARGB2RGBA(scheme.outline) : [0, 0, 0, 0],
+
+                // Text
+                active_widgets_text: ARGB2RGBA(scheme.onBackground),
+                primary_first_tab_text: ARGB2RGBA(scheme.primary),
+                primary_second_tab_text: ARGB2RGBA(scheme.secondary),
+                primary_widgets_text: ARGB2RGBA(scheme.onSecondaryContainer),
+                search_text: ARGB2RGBA(scheme.onPrimaryContainer),
+                section_group_text: ARGB2RGBA(scheme.onBackground),
+                third_tab_text: ARGB2RGBA(scheme.secondary),
+
+                // Shadows
+                text_shadow: ARGB2RGBA(scheme.shadow, shadowIntensity),
+                shadow: ARGB2RGBA(scheme.shadow, shadowIntensity),
+                widgets_shadow: ARGB2RGBA(scheme.shadow, shadowIntensity),
+
+                // Sliders
+                slider_grab: ARGB2RGBA(scheme.secondaryContainer),
+                slider_grab_active: ARGB2RGBA(scheme.secondary),
+
+                // Healthbars
+                healthbar_ally: [0.184, 0.698, 0.176, 1.0],
+                healthbar_enemy: [0.765, 0.227, 0.184, 1.0],
+                healthbar_roshan: [0.81, 0.21, 0.21, 1.0],
+                healthbar_self: [0.678, 0.961, 0.384, 1.0],
+                manabar: [0.31, 0.471, 0.98, 1.0],
+
+                // Miscellaneous
+                disabled_switch_circle: ARGB2RGBA(scheme.onBackground),
+                indication_active: ARGB2RGBA(scheme.primary),
+                indication_inactive: ARGB2RGBA(scheme.onBackground),
+                primary: ARGB2RGBA(scheme.primary),
+            };
+
+            const jsonString = JSON.stringify(generatedTheme, null, 2);
+
+            const hexColor = baseColor.slice(1).toLowerCase();
+            const transparencyHex = Math.round(backgroundTransparency * 255).toString(16).padStart(2, "0").toLowerCase();
+            const shadowsHex = Math.round(shadowIntensity * 255).toString(16).padStart(2, "0").toLowerCase();
+            const mode = isDarkMode ? "dark" : "light";
+            const outline = enableOutlinesSeparators ? "-outline" : "";
+            const fileName = `${hexColor}${transparencyHex}-${shadowsHex}-${mode}${outline}.json`;
+
+            const blob = new Blob([jsonString], { type: "application/json" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = fileName;
+            a.click();
+            URL.revokeObjectURL(url);
         });
     </script>
 </body>

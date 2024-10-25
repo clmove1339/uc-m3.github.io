@@ -1,243 +1,319 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark-theme">
 
 <head>
-    <meta charset="UTF-8" />
-    <title>umbrella m3 palette</title>
-    <link rel="stylesheet" href="styles.css" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@simonwep/pickr/dist/themes/monolith.min.css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Umbrella Material Theme Generator</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@simonwep/pickr/dist/themes/nano.min.css" />
+    <script type="importmap">
+      {
+        "imports": {
+          "@material/web/": "https://esm.run/@material/web/",
+          "@material/material-color-utilities/": "https://esm.run/@material/material-color-utilities/"
+        }
+      }
+    </script>
+    <script type="module">
+        import '@material/web/all.js';
+        import { styles as typescaleStyles } from '@material/web/typography/md-typescale-styles.js';
+        document.adoptedStyleSheets.push(typescaleStyles.styleSheet);
+    </script>
 </head>
 
 <body>
-    <div class="container" id="root">
-        <h1>umbrella m3 palette generator</h1>
-        <div class="settings">
-            <label for="colorpicker">
-                Accent Color
-                <div id="colorpicker"></div>
-            </label>
+    <main>
+        <div class="center-container">
+            <section class="content">
+                <h1 class="md-headline-large">
+                    <span class="material-icons">palette</span>
+                    Umbrella Material Theme Generator
+                </h1>
+                <p class="md-body-medium">Generate a custom Material Design theme based on your preferences.</p>
+            </section>
 
-            <br>
-
-            <label for="darkMode">
-                Dark Mode
-                <div class="switch">
-                    <input type="checkbox" id="darkMode" />
-                    <span class="slider"></span>
+            <section class="controls">
+                <div class="input-container">
+                    <label for="color-picker" class="input-label">
+                        <span class="material-icons">colorize</span>
+                        Seed Color
+                    </label>
+                    <div id="color-picker"></div>
                 </div>
-            </label>
-
-            <br>
-
-            <label for="transparency">
-                Transparency
-                <input type="range" id="transparency" min="0" max="1" step="0.01" value="0.8" />
-            </label>
-
-            <br>
-
-            <label for="shadows">
-                Shadows
-                <input type="range" id="shadows" min="0" max="1" step="0.01" value="1" />
-            </label>
-
-            <br>
-
-            <label for="outlines">
-                Show Outlines & Separators
-                <div class="switch">
-                    <input type="checkbox" id="outlines" />
-                    <span class="slider"></span>
+                <div class="input-container">
+                    <label for="brightnessSlider" class="input-label">
+                        <span class="material-icons">brightness_medium</span>
+                        Brightness
+                    </label>
+                    <md-slider min="0" max="100" value="85" id="brightnessSlider"
+                        aria-label="Adjust brightness"></md-slider>
                 </div>
-            </label>
+                <div class="input-container">
+                    <label for="saturationSlider" class="input-label">
+                        <span class="material-icons">gradient</span>
+                        Saturation
+                    </label>
+                    <md-slider min="0" max="100" value="75" id="saturationSlider"
+                        aria-label="Adjust saturation"></md-slider>
+                </div>
+                <div class="input-container">
+                    <label for="hueRotationSlider" class="input-label">
+                        <span class="material-icons">rotate_right</span>
+                        Hue Rotation
+                    </label>
+                    <md-slider min="0" max="360" value="0" id="hueRotationSlider"
+                        aria-label="Adjust hue rotation"></md-slider>
+                </div>
+
+                <div class="separator"></div>
+
+                <div class="input-container">
+                    <label for="darkThemeSwitch" class="input-label">
+                        <span class="material-icons">dark_mode</span>
+                        Dark Colors
+                    </label>
+                    <md-switch id="darkThemeSwitch" aria-label="Toggle dark theme"></md-switch>
+                </div>
+
+                <div class="input-container">
+                    <label for="transparencySlider" class="input-label">
+                        <span class="material-icons">opacity</span>
+                        Transparency
+                    </label>
+                    <md-slider min="0" max="1" value="0.8" step="0.01" id="transparencySlider" aria-label="Adjust transparency"></md-slider>
+                </div>
+
+                <div class="input-container">
+                    <label for="shadowsSlider" class="input-label">
+                        <span class="material-icons">filter_drama</span>
+                        Shadows
+                    </label>
+                    <md-slider min="0" max="1" value="1" step="0.01" id="shadowsSlider" aria-label="Adjust shadows"></md-slider>
+                </div>
+
+                <div class="input-container">
+                    <label for="outlineSwitch" class="input-label">
+                        <span class="material-icons">border_color</span>
+                        Enable Outlines/Separators
+                    </label>
+                    <md-switch id="outlineSwitch" aria-label="Toggle outlines and separators"></md-switch>
+                </div>
+
+                <div class="separator"></div>
+
+                <md-filled-button id="generate" aria-label="Generate and download theme">
+                    <span class="material-icons">file_download</span>
+                    Generate Theme
+                </md-filled-button>
+            </section>
+
+            <details>
+                <summary class="summary-header">
+                    <span class="material-icons">list</span>
+                    <md-headline-large>Tokens</md-headline-large>
+                </summary>
+                <div class="details-content">
+                    <section id="colorPalette" class="color-palette" aria-label="Generated color palette">
+                    </section>
+                </div>
+            </details>
         </div>
-        <button id="generate">Generate Theme</button>
-
-        <br>
-
-        <div class="visit-counter">
-            <img src="https://moe-counter.es3n1n.eu/get/@clmove1339-umbrella-m3-theme?theme=moebooru"
-                alt="views-counter" height="96" />
-        </div>
-
-        <div class="contacts">
-            <div>Author: <a href="https://clmove.t.me" target="_blank">@clmove</a></div>
-        </div>
-    </div>
-
+    </main>
     <script src="https://cdn.jsdelivr.net/npm/@simonwep/pickr/dist/pickr.min.js"></script>
     <script type="module">
-        import { argbFromHex, themeFromSourceColor } from "https://cdn.jsdelivr.net/npm/@importantimport/material-color-utilities@0.2.2-alpha.0/+esm";
+        import * as MaterialColorUtilities from "@material/material-color-utilities/index.js";
+
+        const elements = {
+            brightnessSlider: document.getElementById('brightnessSlider'),
+            saturationSlider: document.getElementById('saturationSlider'),
+            hueRotationSlider: document.getElementById('hueRotationSlider'),
+            darkThemeSwitch: document.getElementById('darkThemeSwitch'),
+            transparencySlider: document.getElementById('transparencySlider'),
+            shadowsSlider: document.getElementById('shadowsSlider'),
+            outlineSwitch: document.getElementById('outlineSwitch'),
+            generateButton: document.getElementById('generate'),
+            colorPalette: document.getElementById('colorPalette')
+        };
+
+        let currentTheme;
+        let generatedScheme;
+        let seedColor = '#6750A4';
 
         const pickr = Pickr.create({
-            el: '#colorpicker',
-            theme: 'monolith',
-            default: '#464dd3',
+            el: '#color-picker',
+            theme: 'nano',
+            default: seedColor,
             useAsButton: false,
             swatches: [],
             components: {
                 hue: true,
+                preview: true,
                 interaction: {
                     hex: true,
                     rgba: true,
-                    input: true,
+                    input: true
                 }
             }
         });
 
-        const changeAccent = (color, source, instance) => {
-            pickr.applyColor(color.toHEXA().toString());
+        pickr.on('change', (color) => {
+            seedColor = color.toHEXA().toString();
+            pickr.setColor(seedColor);
+            generateAndApplyColors();
+        });
 
-            const theme = themeFromSourceColor(argbFromHex(pickr.getColor().toHEXA().toString()));
-            const scheme = theme.schemes.dark;
+        const colorUtils = {
+            hexToRgb: (hex) => hex.match(/\w\w/g).map(x => parseInt(x, 16)),
+            rgbToHex: (r, g, b) => '#' + [r, g, b].map(x => x.toString(16).padStart(2, '0')).join(''),
+            rgbToHsv: ([r, g, b]) => {
+                r /= 255; g /= 255; b /= 255;
+                const v = Math.max(r, g, b);
+                const c = v - Math.min(r, g, b);
+                const h = c && ((v === r) ? (g - b) / c : ((v === g) ? 2 + (b - r) / c : 4 + (r - g) / c));
+                return [60 * (h < 0 ? h + 6 : h), v && c / v, v];
+            },
+            hsvToRgb: ([h, s, v]) => {
+                const f = (n, k = (n + h / 60) % 6) => Math.round((v - v * s * Math.max(Math.min(k, 4 - k, 1), 0)) * 255);
+                return [f(5), f(3), f(1)];
+            },
+            adjustColor: (hex, brightness, saturation, hueRotation) => {
+                let [h, s, v] = colorUtils.rgbToHsv(colorUtils.hexToRgb(hex));
+                h = (h + hueRotation) % 360;
+                s = Math.min(1, Math.max(0, s * (saturation / 100)));
+                v = Math.min(1, Math.max(0, v * (brightness / 100)));
+                return colorUtils.rgbToHex(...colorUtils.hsvToRgb([h, s, v]));
+            }
+        };
 
-            const background = "#" + scheme.background.toString(16).slice(2, 8);
-            const text = "#" + scheme.onSurface.toString(16).slice(2, 8);
-            const border = "#" + scheme.onSurfaceVariant.toString(16).slice(2, 8) + "80";
-            const button = "#" + scheme.onSecondary.toString(16).slice(2, 8);
-            const accent = "#" + scheme.primary.toString(16).slice(2, 8);
+        function generateAndApplyColors() {
+            const seedColorInt = parseInt(seedColor.replace('#', ''), 16);
+            const brightness = elements.brightnessSlider.value / 100;
+            const saturation = elements.saturationSlider.value / 100;
+            const hueRotation = parseInt(elements.hueRotationSlider.value);
 
-            document.body.style.backgroundColor = background;
-            document.body.style.color = text;
-            document.documentElement.style.setProperty('--accent-color', button);
-            document.documentElement.style.setProperty('--background-color', background);
-            document.documentElement.style.setProperty('--text-color', text);
-            document.getElementById("root").style.borderColor = border;
-            document.getElementById("generate").style.backgroundColor = button;
-            document.getElementById("generate").style.color = text;
-            document.getElementById('transparency').style.backgroundImage = 'linear-gradient(to right, ' + button + ', ' + button + ')';
-            document.getElementById('shadows').style.backgroundImage = 'linear-gradient(to right, ' + button + ', ' + button + ')';
-            document.getElementById('transparency').style.setProperty('--sliderColor', '#ccc');
-            document.getElementById('shadows').style.setProperty('--sliderColor', '#ccc');
+            currentTheme = MaterialColorUtilities.themeFromSourceColor(seedColorInt);
+            let scheme = elements.darkThemeSwitch.selected ? currentTheme.schemes.dark : currentTheme.schemes.light;
+
+            const themeStyles = new CSSStyleSheet();
+            Object.fromEntries(
+                Object.entries(currentTheme.schemes.dark.toJSON()).map(([key, value]) => {
+                    const adjustedColor = colorUtils.adjustColor(
+                        MaterialColorUtilities.hexFromArgb(value),
+                        brightness * 100,
+                        saturation * 100,
+                        hueRotation
+                    );
+                    themeStyles.insertRule(`html { --md-sys-color-${key}: ${adjustedColor}; }`);
+                    return [key, adjustedColor];
+                })
+            );
+
+            document.adoptedStyleSheets = [themeStyles];
+
+            const adjustedScheme = Object.fromEntries(
+                Object.entries(scheme.toJSON()).map(([key, value]) => {
+                    const adjustedColor = colorUtils.adjustColor(
+                        MaterialColorUtilities.hexFromArgb(value),
+                        brightness * 100,
+                        saturation * 100,
+                        hueRotation
+                    );
+                    themeStyles.insertRule(`html { --md-sys-color-${key}: ${adjustedColor}; }`);
+                    return [key, adjustedColor];
+                })
+            );
+
+            generatedScheme = adjustedScheme;
+            displayColorPalette(generatedScheme);
         }
 
-        pickr.on('change', changeAccent);
-        pickr.setColor('#464dd3');
-        changeAccent(pickr.getColor());
-
-        const rangeInputs = document.querySelectorAll('input[type="range"]');
-        document.getElementById('transparency').style.backgroundSize = (0.8) * 100 / (1.0) + '% 100%';
-        document.getElementById('shadows').style.backgroundSize = (1) * 100 / (1.0) + '% 100%';
-        function handleInputChange(e) {
-            let target = e.target;
-
-            if (e.target.type !== 'range') target = document.getElementById('range');
-
-            const min = target.min;
-            const max = target.max;
-            const val = target.value;
-            target.style.backgroundSize = (val - min) * 100 / (max - min) + '% 100%';
+        function displayColorPalette(scheme) {
+            elements.colorPalette.innerHTML = Object.entries(scheme).map(([key, value]) => {
+                const rgb = colorUtils.hexToRgb(value);
+                const luminance = 0.299 * rgb[0] + 0.587 * rgb[1] + 0.114 * rgb[2];
+                const textColorHex = luminance > 128 ? '#000000' : '#FFFFFF';
+                return `
+                    <div class="color-swatch" style="background-color: ${value};" aria-label="${key} color: ${value}">
+                        <span class="swatch-name" style="color: ${textColorHex}">${key}</span>
+                        <span class="swatch-hex" style="color: ${textColorHex}" onclick="navigator.clipboard.writeText('${value}').then(() => alert('Copied ${value} to clipboard!'))">${value}</span>
+                    </div>
+                `;
+            }).join('');
         }
 
-        rangeInputs.forEach(input => {
-            input.addEventListener('input', handleInputChange);
-        })
-
-        const transparencySlider = document.getElementById("transparency");
-        const shadowsSlider = document.getElementById("shadows");
-        const transparencyTooltip = document.createElement("div");
-        const shadowsTooltip = document.createElement("div");
-        transparencyTooltip.id = "transparency-tooltip";
-        document.body.appendChild(transparencyTooltip);
-
-        transparencySlider.addEventListener("mousemove", (event) => {
-            const value = event.target.value;
-            const rect = transparencySlider.getBoundingClientRect();
-            const tooltipWidth = transparencyTooltip.offsetWidth;
-            transparencyTooltip.style.display = "block";
-            transparencyTooltip.style.left = rect.left + rect.width / 2 - tooltipWidth / 2 + "px";
-            transparencyTooltip.style.top = rect.top - 30 + "px";
-            transparencyTooltip.textContent = `${(value * 100).toFixed(0)}%`;
+        // Add event listeners for auto-apply on slider change
+        ['brightnessSlider', 'saturationSlider', 'hueRotationSlider', 'darkThemeSwitch', 'transparencySlider', 'shadowsSlider', 'outlineSwitch'].forEach(id => {
+            elements[id].addEventListener('input', generateAndApplyColors);
         });
 
-        transparencySlider.addEventListener("mouseleave", () => {
-            transparencyTooltip.style.display = "none";
-        });
-
-        shadowsTooltip.id = "shadows-tooltip";
-        document.body.appendChild(shadowsTooltip);
-
-        shadowsSlider.addEventListener("mousemove", (event) => {
-            const value = event.target.value;
-            const rect = shadowsSlider.getBoundingClientRect();
-            const tooltipWidth = shadowsTooltip.offsetWidth;
-            shadowsTooltip.style.display = "block";
-            shadowsTooltip.style.left = rect.left + rect.width / 2 - tooltipWidth / 2 + "px";
-            shadowsTooltip.style.top = rect.top - 30 + "px";
-            shadowsTooltip.textContent = `${(value * 100).toFixed(0)}%`;
-        });
-
-        shadowsSlider.addEventListener("mouseleave", () => {
-            shadowsTooltip.style.display = "none";
-        });
-
-        document.getElementById("generate").addEventListener("click", () => {
+        // Theme generation logic
+        elements.generateButton.addEventListener("click", () => {
             const baseColor = pickr.getColor().toHEXA().toString();
-            const isDarkMode = document.getElementById("darkMode").checked;
-            const backgroundTransparency = parseFloat(transparencySlider.value);
-            const shadowIntensity = parseFloat(shadowsSlider.value);
-            const enableOutlinesSeparators = document.getElementById("outlines").checked;
+            const isDarkMode = elements.darkThemeSwitch.selected;
+            const backgroundTransparency = parseFloat(elements.transparencySlider.value);
+            const shadowIntensity = parseFloat(elements.shadowsSlider.value);
+            const enableOutlinesSeparators = elements.outlineSwitch.selected;
 
-            const theme = themeFromSourceColor(argbFromHex(baseColor));
-            const scheme = isDarkMode ? theme.schemes.dark : theme.schemes.light;
+            const scheme = generatedScheme;
 
-            const ARGB2RGBA = (argb, alpha = 1.0) => [
-                ((argb >> 16) & 0xff) / 255,
-                ((argb >> 8) & 0xff) / 255,
-                (argb & 0xff) / 255,
-                alpha,
-            ];
+            const HEX2RGBA = (hex, alpha = 1.0) => {
+                const [r, g, b] = colorUtils.hexToRgb(hex);
+                return [r / 255, g / 255, b / 255, alpha];
+            }
 
             const generatedTheme = {
                 // Backgrounds
-                additional_background: ARGB2RGBA(scheme.background, backgroundTransparency),
-                button_active_background: ARGB2RGBA(scheme.secondaryContainer, backgroundTransparency),
-                button_background: ARGB2RGBA(scheme.surface, backgroundTransparency),
-                disabled_switch_background: ARGB2RGBA(scheme.surfaceVariant, backgroundTransparency),
-                enabled_switch_background: ARGB2RGBA(scheme.secondaryContainer, backgroundTransparency),
-                group_background: ARGB2RGBA(scheme.background, backgroundTransparency),
-                hero_tab_filter_background: ARGB2RGBA(scheme.secondaryContainer, backgroundTransparency),
-                keybind_background: ARGB2RGBA(scheme.background, backgroundTransparency),
-                keybind_background_active: ARGB2RGBA(scheme.secondaryContainer, backgroundTransparency),
-                left_tabs_background: ARGB2RGBA(scheme.background, backgroundTransparency),
-                main_background: ARGB2RGBA(scheme.surface, backgroundTransparency),
-                popup_background: ARGB2RGBA(scheme.surface, backgroundTransparency),
-                selected_tabs_background: ARGB2RGBA(scheme.secondaryContainer, backgroundTransparency),
-                slider_background: ARGB2RGBA(scheme.surfaceVariant, backgroundTransparency),
-                slider_background_active: ARGB2RGBA(scheme.primary, backgroundTransparency),
-                combo_frame: ARGB2RGBA(scheme.surfaceVariant, backgroundTransparency),
-                combo_item: ARGB2RGBA(scheme.secondaryContainer, backgroundTransparency),
-                combo_item_active: ARGB2RGBA(scheme.secondary, backgroundTransparency),
-                multiselect_item: ARGB2RGBA(scheme.secondaryContainer, backgroundTransparency),
-                multiselect_item_selected: ARGB2RGBA(scheme.secondary, backgroundTransparency),
-                input_text_bg: ARGB2RGBA(scheme.background, backgroundTransparency),
-                scrollbar_bg: ARGB2RGBA(scheme.surfaceVariant, backgroundTransparency),
+                additional_background: HEX2RGBA(scheme.background, backgroundTransparency),
+                button_active_background: HEX2RGBA(scheme.primaryContainer, backgroundTransparency),
+                button_background: HEX2RGBA(scheme.surfaceVariant, backgroundTransparency),
+                disabled_switch_background: HEX2RGBA(scheme.surfaceVariant, backgroundTransparency * 0.5),
+                enabled_switch_background: HEX2RGBA(scheme.primaryContainer, backgroundTransparency),
+                group_background: HEX2RGBA(scheme.surface, backgroundTransparency),
+                hero_tab_filter_background: HEX2RGBA(scheme.secondaryContainer, backgroundTransparency),
+                keybind_background: HEX2RGBA(scheme.surfaceVariant, backgroundTransparency),
+                keybind_background_active: HEX2RGBA(scheme.primaryContainer, backgroundTransparency),
+                left_tabs_background: HEX2RGBA(scheme.surface, backgroundTransparency),
+                main_background: HEX2RGBA(scheme.background, backgroundTransparency),
+                popup_background: HEX2RGBA(scheme.surface, backgroundTransparency),
+                selected_tabs_background: HEX2RGBA(scheme.primaryContainer, backgroundTransparency),
+                slider_background: HEX2RGBA(scheme.surfaceVariant, backgroundTransparency),
+                slider_background_active: HEX2RGBA(scheme.primary, backgroundTransparency),
+                combo_frame: HEX2RGBA(scheme.surfaceVariant, backgroundTransparency),
+                combo_item: HEX2RGBA(scheme.surface, backgroundTransparency),
+                combo_item_active: HEX2RGBA(scheme.primaryContainer, backgroundTransparency),
+                multiselect_item: HEX2RGBA(scheme.surface, backgroundTransparency),
+                multiselect_item_selected: HEX2RGBA(scheme.primaryContainer, backgroundTransparency),
+                input_text_bg: HEX2RGBA(scheme.surfaceVariant, backgroundTransparency),
+                scrollbar_bg: HEX2RGBA(scheme.surfaceVariant, backgroundTransparency * 0.7),
 
                 // Outlines and Separators
-                group_outline: enableOutlinesSeparators ? ARGB2RGBA(scheme.outlineVariant) : [0, 0, 0, 0],
-                hero_tab_filter_separator: enableOutlinesSeparators ? ARGB2RGBA(scheme.outlineVariant) : [0, 0, 0, 0],
-                outline: enableOutlinesSeparators ? ARGB2RGBA(scheme.outline) : [0, 0, 0, 0],
-                popup_border: enableOutlinesSeparators ? ARGB2RGBA(scheme.outlineVariant) : [0, 0, 0, 0],
-                search_outline: enableOutlinesSeparators ? ARGB2RGBA(scheme.outlineVariant) : [0, 0, 0, 0],
-                separator: enableOutlinesSeparators ? ARGB2RGBA(scheme.outline) : [0, 0, 0, 0],
+                group_outline: enableOutlinesSeparators ? HEX2RGBA(scheme.outlineVariant) : [0, 0, 0, 0],
+                hero_tab_filter_separator: enableOutlinesSeparators ? HEX2RGBA(scheme.outlineVariant) : [0, 0, 0, 0],
+                outline: enableOutlinesSeparators ? HEX2RGBA(scheme.outline) : [0, 0, 0, 0],
+                popup_border: enableOutlinesSeparators ? HEX2RGBA(scheme.outlineVariant) : [0, 0, 0, 0],
+                search_outline: enableOutlinesSeparators ? HEX2RGBA(scheme.outlineVariant) : [0, 0, 0, 0],
+                separator: enableOutlinesSeparators ? HEX2RGBA(scheme.outline) : [0, 0, 0, 0],
 
                 // Text
-                active_widgets_text: ARGB2RGBA(scheme.onBackground),
-                primary_first_tab_text: ARGB2RGBA(scheme.primary),
-                primary_second_tab_text: ARGB2RGBA(scheme.secondary),
-                primary_widgets_text: ARGB2RGBA(scheme.onSecondaryContainer),
-                search_text: ARGB2RGBA(scheme.onPrimaryContainer),
-                section_group_text: ARGB2RGBA(scheme.onBackground),
-                third_tab_text: ARGB2RGBA(scheme.secondary),
+                active_widgets_text: HEX2RGBA(scheme.onPrimaryContainer),
+                primary_first_tab_text: HEX2RGBA(scheme.primary),
+                primary_second_tab_text: HEX2RGBA(scheme.secondary),
+                primary_widgets_text: HEX2RGBA(scheme.onSurface),
+                search_text: HEX2RGBA(scheme.onSurface),
+                section_group_text: HEX2RGBA(scheme.onSurface),
+                third_tab_text: HEX2RGBA(scheme.tertiary),
 
                 // Shadows
-                text_shadow: ARGB2RGBA(scheme.shadow, shadowIntensity),
-                shadow: ARGB2RGBA(scheme.shadow, shadowIntensity),
-                widgets_shadow: ARGB2RGBA(scheme.shadow, shadowIntensity),
+                text_shadow: HEX2RGBA(scheme.shadow, shadowIntensity * 0.5),
+                shadow: HEX2RGBA(scheme.shadow, shadowIntensity),
+                widgets_shadow: HEX2RGBA(scheme.shadow, shadowIntensity * 0.7),
 
                 // Sliders
-                slider_grab: ARGB2RGBA(scheme.secondaryContainer),
-                slider_grab_active: ARGB2RGBA(scheme.secondary),
+                slider_grab: HEX2RGBA(scheme.primary),
+                slider_grab_active: HEX2RGBA(scheme.primaryContainer),
 
                 // Healthbars
                 healthbar_ally: [0.184, 0.698, 0.176, 1.0],
@@ -247,10 +323,10 @@
                 manabar: [0.31, 0.471, 0.98, 1.0],
 
                 // Miscellaneous
-                disabled_switch_circle: ARGB2RGBA(scheme.onBackground),
-                indication_active: ARGB2RGBA(scheme.primary),
-                indication_inactive: ARGB2RGBA(scheme.onBackground),
-                primary: ARGB2RGBA(scheme.primary),
+                disabled_switch_circle: HEX2RGBA(scheme.onSurfaceVariant),
+                indication_active: HEX2RGBA(scheme.primary),
+                indication_inactive: HEX2RGBA(scheme.onSurfaceVariant),
+                primary: HEX2RGBA(scheme.primary),
             };
 
             const jsonString = JSON.stringify(generatedTheme, null, 2);
@@ -270,6 +346,62 @@
             a.click();
             URL.revokeObjectURL(url);
         });
+
+        // Initial color generation
+        generateAndApplyColors();
+    </script>
+    <script>
+        const details = document.querySelector('details');
+        const summaryHeader = document.querySelector('.summary-header');
+        const detailsContent = document.querySelector('.details-content');
+
+        let isAnimating = false;
+
+        summaryHeader.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (!isAnimating) {
+                isAnimating = true;
+                if (details.hasAttribute('open')) {
+                    closeDetails();
+                } else {
+                    openDetails();
+                }
+            }
+        });
+
+        function openDetails() {
+            details.setAttribute('open', '');
+            requestAnimationFrame(() => {
+                detailsContent.style.maxHeight = `${detailsContent.scrollHeight}px`;
+                detailsContent.style.opacity = '1';
+                detailsContent.addEventListener('transitionend', onOpenTransitionEnd);
+            });
+        }
+
+        function closeDetails() {
+            detailsContent.style.maxHeight = `${detailsContent.scrollHeight}px`;
+            detailsContent.style.opacity = '0';
+            requestAnimationFrame(() => {
+                detailsContent.style.maxHeight = '0';
+            });
+            detailsContent.addEventListener('transitionend', onCloseTransitionEnd);
+        }
+
+        function onOpenTransitionEnd(e) {
+            if (e.propertyName === 'max-height') {
+                detailsContent.style.maxHeight = 'none'; // Allow content to grow if needed
+                detailsContent.removeEventListener('transitionend', onOpenTransitionEnd);
+                isAnimating = false;
+            }
+        }
+
+        function onCloseTransitionEnd(e) {
+            if (e.propertyName === 'max-height') {
+                details.removeAttribute('open');
+                detailsContent.removeEventListener('transitionend', onCloseTransitionEnd);
+                isAnimating = false;
+            }
+        }
     </script>
 </body>
 
